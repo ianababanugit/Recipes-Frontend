@@ -6,7 +6,7 @@
     <BaseDivider />
     <div class="footer">
       <BaseTypography variant="body-02"
-        >Iana Incorporated © 2024</BaseTypography
+        >Iana Incorporated © {{ year }}</BaseTypography
       >
     </div>
   </div>
@@ -16,6 +16,8 @@
 useHead(() => ({
   title: "Recipes",
 }));
+
+const year = new Date().getFullYear();
 </script>
 
 <style lang="scss" scoped>
