@@ -53,12 +53,22 @@
               >
                 Ингредиенты
               </BaseTypography>
-              <BaseCircularIconButton
-                icon="fluent:task-list-24-regular"
-                size="small"
-                variant="primary"
-                @click="hasCheckboxes = !hasCheckboxes"
-              />
+              <div class="ingredients-section-header-actions">
+                <BaseCircularIconButton
+                  icon="fluent:task-list-24-regular"
+                  size="small"
+                  variant="primary"
+                  @click="hasCheckboxes = !hasCheckboxes"
+                />
+                <BaseCircularIconButton
+                  v-if="hasCheckboxes"
+                  :icon="justCopied ? 'ph:check-bold' : 'ph:copy'"
+                  size="small"
+                  variant="primary"
+                  :disabled="!checkedIngredientsText"
+                  @click="handleCopyChecked"
+                />
+              </div>
             </div>
 
             <ul class="ingredients-list">
@@ -69,6 +79,7 @@
               >
                 <BaseCheckbox
                   v-if="hasCheckboxes"
+                  v-model="checkedIngredients[ingredient.id]"
                   class="checkbox-ingredient"
                 />
                 <BaseTypography
@@ -135,6 +146,7 @@ const { params } = useRoute();
 const { token } = useAuthStore();
 const baseUrl = useBaseUrl();
 const hasCheckboxes = ref(false);
+const checkedIngredients = reactive<Record<number, boolean>>({});
 const { data, status } = useFetch<Recipe>(`${baseUrl}/recipes/${params.id}`, {
   headers: {
     Authorization: `Bearer ${token}`,
@@ -151,6 +163,42 @@ const characteristicsText = computed(() =>
     .filter(Boolean)
     .join(" • ")
 );
+
+const checkedIngredientsList = computed(() =>
+  (data.value?.recipeIngredients ?? []).filter(
+    (ingredient) => checkedIngredients[ingredient.id]
+  )
+);
+
+const checkedIngredientsText = computed(() =>
+  checkedIngredientsList.value
+    .map((ingredient) =>
+      ingredient.quantity && ingredient.unit
+        ? `${ingredient.description} — ${ingredient.quantity} ${ingredient.unit}`
+        : ingredient.description
+    )
+    .join("\n")
+);
+
+const { copy } = useClipboard();
+const justCopied = ref(false);
+let copiedResetTimeout: ReturnType<typeof setTimeout> | null = null;
+
+async function handleCopyChecked() {
+  if (!checkedIngredientsText.value) return;
+
+  await copy(checkedIngredientsText.value);
+
+  justCopied.value = true;
+  if (copiedResetTimeout) clearTimeout(copiedResetTimeout);
+  copiedResetTimeout = setTimeout(() => {
+    justCopied.value = false;
+  }, 1500);
+}
+
+onBeforeUnmount(() => {
+  if (copiedResetTimeout) clearTimeout(copiedResetTimeout);
+});
 </script>
 
 <style lang="scss" scoped>
@@ -275,6 +323,11 @@ const characteristicsText = computed(() =>
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+.ingredients-section-header-actions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
 }
 .step-number {
   width: 32px;
