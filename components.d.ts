@@ -30,6 +30,7 @@ declare module 'vue' {
     CategoryTabsIconPizza: typeof import('./components/category-tabs/icon/pizza.vue')['default']
     CategoryTabsIconSalad: typeof import('./components/category-tabs/icon/salad.vue')['default']
     CategoryTabsIconSauce: typeof import('./components/category-tabs/icon/sauce.vue')['default']
+    CategoryTabsIconSidedish: typeof import('./components/category-tabs/icon/sidedish.vue')['default']
     CategoryTabsIconSoup: typeof import('./components/category-tabs/icon/soup.vue')['default']
     CategoryTabsIconSushi: typeof import('./components/category-tabs/icon/sushi.vue')['default']
     CategoryTabsItem: typeof import('./components/category-tabs/item.vue')['default']

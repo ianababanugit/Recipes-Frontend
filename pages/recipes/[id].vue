@@ -45,19 +45,32 @@
             </div>
           </div>
           <div class="ingredients-section">
-            <BaseTypography
-              tag="h2"
-              variant="body-01-semibold"
-              class="ingredients-heading"
-            >
-              Ингредиенты
-            </BaseTypography>
+            <div class="ingredients-section-header">
+              <BaseTypography
+                tag="h2"
+                variant="body-01-semibold"
+                class="ingredients-heading"
+              >
+                Ингредиенты
+              </BaseTypography>
+              <BaseCircularIconButton
+                icon="fluent:task-list-24-regular"
+                size="small"
+                variant="primary"
+                @click="hasCheckboxes = !hasCheckboxes"
+              />
+            </div>
+
             <ul class="ingredients-list">
               <li
                 v-for="ingredient in data.recipeIngredients"
                 :key="ingredient.id"
-                class="ingredient"
+                class="ingredient checkbox-wrapper"
               >
+                <BaseCheckbox
+                  v-if="hasCheckboxes"
+                  class="checkbox-ingredient"
+                />
                 <BaseTypography
                   tag="span"
                   variant="body-03"
@@ -121,7 +134,7 @@ import type { Recipe } from "~/types/recipe";
 const { params } = useRoute();
 const { token } = useAuthStore();
 const baseUrl = useBaseUrl();
-
+const hasCheckboxes = ref(false);
 const { data, status } = useFetch<Recipe>(`${baseUrl}/recipes/${params.id}`, {
   headers: {
     Authorization: `Bearer ${token}`,
@@ -249,6 +262,20 @@ const characteristicsText = computed(() =>
   position: relative;
 }
 
+.checkbox-ingredient {
+  padding-right: $spacing-3;
+}
+.checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  flex-wrap: nowrap;
+}
+.ingredients-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 .step-number {
   width: 32px;
   height: 32px;
